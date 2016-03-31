@@ -17,12 +17,14 @@ requirejs.config({
         hammer: 'js/hammer',
         iscroll: 'js/iscroll-probe',
         jquery: 'js/jquery-2.1.0',
+        knockout: 'js/knockout-3.2.0.debug',
+        'knockout.validation': 'js/knockout.validation',
         move: 'js/move',
         text: 'js/text'
     }
 });
 
-requirejs(['application', 'chitu', 'jquery'], function(move, app: chitu.Application) {    
+requirejs(['application', 'chitu', 'jquery'], function(move, app: chitu.Application) {
     if (!location.hash) {
         location.hash = 'home_index';
     }
