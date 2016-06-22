@@ -1,9 +1,10 @@
-export = function(page: chitu.Page) {
-    requirejs(['c!css/app/home/index']);
+export = class IndexPage extends chitu.Page {
+    constructor(args) {
+        super(args);
+        this.load.add(this.page_load);
+    }
 
-    var load_result = $.Deferred();
-    page.load.add(() => {
-        setTimeout(() => load_result.resolve(), 1000);
-        return load_result;
-    });
+    private page_load(sender: IndexPage, args: any) {
+        $(this.element).find('[name="text"]').text(args.text);
+    }
 }

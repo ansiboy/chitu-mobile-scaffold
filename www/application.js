@@ -1,19 +1,5 @@
-define(["require", "exports", 'chitu', 'container-factory'], function (require, exports, chitu, ContainerFactory) {
-    var app = new chitu.Application({
-        openSwipe: function (routeData) {
-            return chitu.SwipeDirection.Left;
-        },
-        container: function (routeData, previous) {
-            return ContainerFactory.createInstance(app, routeData, previous);
-        }
-    });
-    var viewPath = 'modules/{controller}/{action}.html';
-    var actionPath = 'modules/{controller}/{action}';
-    app.routes().mapRoute({
-        name: 'Normal',
-        url: '{controller}_{action}',
-        viewPath: viewPath,
-        actionPath: actionPath
-    });
+define(["require", "exports", 'chitu'], function (require, exports, chitu) {
+    var app = new chitu.Application();
     app.run();
+    return app;
 });

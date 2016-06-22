@@ -1,73 +1,61 @@
-/// <reference path="jquery.d.ts" /> 
 declare namespace chitu {
-    class Action {
-        private _name;
-        private _handle;
-        constructor(controller: any, name: any, handle: any);
-        name(): any;
-        execute(page: chitu.Page): any;
+    interface RouteData {
+        actionPath: string;
+        viewPath: string;
+        values: any;
+        pageName: string;
+        resource?: string[];
     }
-    function createActionDeferred(routeData: chitu.RouteData): JQueryPromise<Action>;
-    function createViewDeferred(routeData: RouteData): JQueryPromise<string>;
-}
-declare namespace chitu {
+    class UrlParser {
+        private path_string;
+        private path_spliter_char;
+        private param_spliter;
+        private name_spliter_char;
+        private _actionPath;
+        private _viewPath;
+        private _cssPath;
+        private _parameters;
+        private _pageName;
+        private pathBase;
+        private HASH_MINI_LENGTH;
+        constructor(pathBase?: string);
+        pareeUrl(url: string): RouteData;
+        private pareeUrlQuery(query);
+    }
     interface ApplicationConfig {
-        container?: (routeData: chitu.RouteData, prevous: PageContainer) => PageContainer;
-        openSwipe?: (routeData: chitu.RouteData) => SwipeDirection;
-        closeSwipe?: (route: chitu.RouteData) => SwipeDirection;
+        container?: (routeData: RouteData, prevous: PageContainer) => PageContainer;
+        openSwipe?: (routeData: RouteData) => SwipeDirection;
+        closeSwipe?: (route: RouteData) => SwipeDirection;
+        pathBase?: string;
     }
     class Application {
-        pageCreating: chitu.Callback;
-        pageCreated: chitu.Callback;
+        pageCreating: Callback<Application, any>;
+        pageCreated: Callback<Application, Page>;
         private _config;
-        private _routes;
         private _runned;
         private zindex;
         private back_deferred;
         private start_flag_hash;
         private start_hash;
         private container_stack;
-        constructor(config: ApplicationConfig);
-        on_pageCreating(context: chitu.PageContext): JQueryPromise<any>;
-        on_pageCreated(page: chitu.Page): JQueryPromise<any>;
+        parseUrl: (url: string) => RouteData;
+        constructor(config?: ApplicationConfig);
+        private on_pageCreating();
+        private on_pageCreated(page);
         config: chitu.ApplicationConfig;
-        routes(): RouteCollection;
         currentPage(): chitu.Page;
         pageContainers: Array<PageContainer>;
         private createPageContainer(routeData);
         protected hashchange(): void;
         run(): void;
         getPage(name: string): chitu.Page;
-        showPage(url: string, args: any): chitu.Page;
+        showPage<T extends Page>(url: string, args?: any): JQueryPromise<T>;
         protected createPageNode(): HTMLElement;
-        redirect(url: string, args?: {}): chitu.Page;
+        redirect<T extends Page>(url: string, args?: any): JQueryPromise<T>;
         back(args?: any): JQueryPromise<any>;
     }
 }
 declare namespace chitu {
-    enum OS {
-        ios = 0,
-        android = 1,
-        other = 2,
-    }
-    class Environment {
-        private _environmentType;
-        private _isIIS;
-        private _os;
-        private _version;
-        private static _instance;
-        constructor();
-        osVersion: number;
-        os: OS;
-        isIOS: boolean;
-        isAndroid: boolean;
-        isApp: boolean;
-        isWeb: boolean;
-        isDegrade: boolean;
-        isWeiXin: boolean;
-        isIPhone: boolean;
-        static instance: Environment;
-    }
     class ControlFactory {
         static createControls(element: HTMLElement, page: Page): Array<Control>;
         static createControl(element: HTMLElement, page: Page): Control;
@@ -87,7 +75,7 @@ declare namespace chitu {
         private _page;
         private static ControlTags;
         protected _name: string;
-        load: Callback;
+        load: Callback<Control, any>;
         parent: Control;
         constructor(element: HTMLElement, page: Page);
         private createChildren(element, page);
@@ -97,7 +85,6 @@ declare namespace chitu {
         children: ControlCollection;
         name: string;
         page: Page;
-        protected fireEvent(callback: chitu.Callback, args: any): JQueryPromise<any>;
         on_load(args: Object): JQueryPromise<any>;
         static register(tagName: string, createControlMethod: (new (element: HTMLElement, page: Page) => Control) | ((element: HTMLElement, page: Page) => Control)): void;
         static createControl(element: HTMLElement, page: Page): Control;
@@ -108,33 +95,33 @@ declare namespace chitu {
     class PageFooter extends Control {
         constructor(element: HTMLElement, page: Page);
     }
-    class ScrollArguments {
-        scrollTop: number;
-        scrollHeight: number;
-        clientHeight: number;
+    interface ScrollArguments {
+        scrollTop?: number;
+        scrollHeight?: number;
+        clientHeight?: number;
     }
     class ScrollView extends Control {
         private _bottomLoading;
-        static scrolling: boolean;
-        scroll: Callback;
-        scrollEnd: Callback;
-        scrollLoad: (sender, args) => JQueryPromise<any>;
+        scroll: Callback<ScrollView, ScrollArguments>;
+        scrollEnd: Callback<ScrollView, ScrollArguments>;
         constructor(element: HTMLElement, page: Page);
         on_load(args: any): JQueryPromise<any>;
         protected on_scrollEnd(args: ScrollArguments): JQueryPromise<any>;
         protected on_scroll(args: ScrollArguments): JQueryPromise<any>;
         static createInstance(element: HTMLElement, page: Page): ScrollView;
         bottomLoading: ScrollViewStatusBar;
-        private static page_scrollEnd(sender, args);
+        disabled: boolean;
     }
     class ScrollViewStatusBar extends Control {
         constructor(element: HTMLElement, page: Page);
     }
     class IScrollView extends ScrollView {
+        private static SCROLLER_TAG_NAME;
         private iscroller;
         constructor(element: HTMLElement, page: Page);
         private init(element);
         refresh(): void;
+        disabled: boolean;
     }
     class FormLoading extends Control {
         private loading_element;
@@ -166,20 +153,26 @@ declare namespace chitu {
         static routeDataRequireAction(): Error;
         static parameterRequireField(fileName: any, parameterName: any): Error;
         static viewCanntNull(): Error;
+        static createPageFail(pageName: string): Error;
+        static actionTypeError(pageName: string): Error;
+        static scrollerElementNotExists(): Error;
     }
 }
 declare namespace chitu {
-    class Callback {
+    interface EventCallback<S, A> {
+        (sender: S, args: A): JQueryPromise<any> | void;
+    }
+    class Callback<S, A> {
         source: any;
         constructor(source: any);
-        add(func: Function): void;
+        add(func: EventCallback<S, A>): void;
         remove(func: Function): void;
         has(func: Function): boolean;
         fireWith(context: any, args: any): any;
         fire(arg1?: any, arg2?: any, arg3?: any, arg4?: any): any;
     }
-    function Callbacks(options?: any): Callback;
-    function fireCallback(callback: chitu.Callback, args: Array<any>): JQueryPromise<any>;
+    function Callbacks<S, A>(options?: any): Callback<S, A>;
+    function fireCallback<S, A>(callback: chitu.Callback<S, A>, sender: S, args: A): JQueryPromise<any>;
 }
 declare namespace chitu {
     enum PageLoadType {
@@ -205,6 +198,14 @@ declare namespace chitu {
         Div = 1,
         Document = 2,
     }
+    type PageArguemnts = {
+        container: PageContainer;
+        routeData: RouteData;
+        view: string;
+    };
+    interface PageConstructor {
+        new (args: PageArguemnts): Page;
+    }
     class Page {
         static animationTime: number;
         private _name;
@@ -215,7 +216,6 @@ declare namespace chitu {
         private _hideResult;
         private _showTime;
         private _hideTime;
-        private _prevous;
         private _routeData;
         private _enableScrollLoad;
         private is_closed;
@@ -228,41 +228,32 @@ declare namespace chitu {
         private _viewHtml;
         private _loading;
         private _controls;
-        preLoad: Callback;
-        load: Callback;
-        loadCompleted: Callback;
-        closing: Callback;
-        closed: Callback;
-        showing: Callback;
-        shown: Callback;
-        hiding: Callback;
-        hidden: Callback;
-        viewChanged: Callback;
-        constructor(container: PageContainer, routeData: RouteData, action: JQueryPromise<Action>, view: JQueryPromise<string>, previous?: chitu.Page);
+        preLoad: Callback<Page, any>;
+        load: Callback<Page, any>;
+        closing: Callback<Page, any>;
+        closed: Callback<{}, {}>;
+        showing: Callback<{}, {}>;
+        shown: Callback<{}, {}>;
+        hiding: Callback<{}, {}>;
+        hidden: Callback<{}, {}>;
+        constructor(args: PageArguemnts);
+        private initialize(container, pageInfo);
         private createControls(element);
-        view: JQueryPromise<string>;
-        action: JQueryPromise<Action>;
-        private enableScrollLoad;
-        private viewHtml;
-        static getPageName(routeData: RouteData): string;
-        routeData: chitu.RouteData;
+        routeData: RouteData;
         name: string;
         element: HTMLElement;
-        previous: chitu.Page;
         visible: boolean;
         container: PageContainer;
         hide(swipe?: SwipeDirection): JQueryPromise<any>;
         findControl<T extends Control>(name: string): T;
-        private fireEvent(callback, args);
-        on_load(args: Object): any;
-        on_loadCompleted(args: Object): void;
+        private fireEvent<A>(callback, args);
+        on_load(args: Object): JQueryPromise<any>;
         on_closing(args: any): JQueryPromise<any>;
         on_closed(args: any): JQueryPromise<any>;
         on_showing(args: any): JQueryPromise<any>;
         on_shown(args: any): JQueryPromise<any>;
         on_hiding(args: any): JQueryPromise<any>;
         on_hidden(args: any): JQueryPromise<any>;
-        on_viewChanged(args: any): JQueryPromise<any>;
     }
 }
 declare namespace chitu {
@@ -279,7 +270,7 @@ declare namespace chitu {
         private open_swipe;
         enableSwipeClose: boolean;
         gesture: Gesture;
-        pageCreated: chitu.Callback;
+        pageCreated: chitu.Callback<PageContainer, Page>;
         constructor(app: Application, previous?: PageContainer);
         on_pageCreated(page: chitu.Page): JQueryPromise<any>;
         private _enableSwipeBack();
@@ -296,8 +287,10 @@ declare namespace chitu {
         currentPage: Page;
         pages: Array<Page>;
         previous: PageContainer;
+        private createActionDeferred(routeData);
+        private createViewDeferred(url);
         private createPage(routeData);
-        showPage(routeData: RouteData, swipe: SwipeDirection): Page;
+        showPage<T extends Page>(routeData: RouteData, swipe: SwipeDirection): JQueryPromise<T>;
     }
     class PageContainerFactory {
         private _app;
@@ -306,91 +299,39 @@ declare namespace chitu {
     }
     class Pan {
         cancel: boolean;
-        start: (e: PanEvent) => void;
-        left: (e: PanEvent) => void;
-        right: (e: PanEvent) => void;
-        up: (e: PanEvent) => void;
-        down: (e: PanEvent) => void;
-        end: (e: PanEvent) => void;
+        start: (e: any) => void;
+        left: (e: any) => void;
+        right: (e: any) => void;
+        up: (e: any) => void;
+        down: (e: any) => void;
+        end: (e: any) => void;
         constructor(gesture: Gesture);
     }
     class Gesture {
         private executedCount;
         private hammersCount;
+        private hammer;
+        private _pans;
         private _prevent;
         prevent: {
             pan: (direction: number) => void;
         };
-        constructor();
-        private getHammer(element);
-        private getPans(element);
-        private clear();
-        createPan(element: HTMLElement): Pan;
-    }
-}
-declare namespace chitu {
-    class PageContext {
-        private _view;
-        private _routeData;
-        constructor(view: JQueryPromise<string>, routeData: RouteData);
-        view(): JQueryPromise<string>;
-        routeData(): RouteData;
-    }
-}
-declare namespace chitu {
-    class Route {
-        private _name;
-        private _pattern;
-        private _defaults;
-        viewPath: string;
-        actionPath: string;
-        constructor(name: string, pattern: string, defaults: Object);
-        name(): string;
-        defaults(): Object;
-        url(): string;
-    }
-}
-declare namespace chitu {
-    class RouteCollection {
-        _source: any;
-        _priority: number;
-        _defaultRoute: chitu.Route;
-        static defaultRouteName: string;
-        _defaults: {};
-        constructor();
-        _init(): void;
-        count(): any;
-        mapRoute(args: any): Route;
-        getRouteData(url: string): chitu.RouteData;
-    }
-}
-declare namespace chitu {
-    class RouteData {
-        private _values;
-        private _viewPath;
-        private _actionPath;
-        private _pageName;
-        private _url;
-        constructor(url: string);
-        values(value?: any): any;
-        viewPath(value?: string): string;
-        actionPath(value?: string): string;
-        pageName(value?: string): string;
-        url(): string;
+        constructor(element: HTMLElement);
+        private on_pan(e);
+        private pans;
+        createPan(): Pan;
     }
 }
 declare namespace chitu {
     class Utility {
         static isType(targetType: Function, obj: any): boolean;
         static isDeferred(obj: any): boolean;
-        static format(source: string, arg1?: string, arg2?: string, arg3?: string, arg4?: string, arg5?: string, arg6?: string, arg7?: string, arg8?: string, arg9?: string, arg10?: string): string;
+        static format(source: string, ...params: string[]): string;
         static fileName(url: any, withExt: any): string;
         static log(msg: any, args?: any[]): void;
-        static loadjs(modules: string[]): JQueryPromise<any>;
+        static loadjs(...modules: string[]): JQueryPromise<any>;
     }
 }
-
-
-declare module "chitu" {
-    export = chitu;    
+declare module "chitu" { 
+    export = chitu; 
 }

@@ -4,7 +4,7 @@
 requirejs.config({
     shim: {
         chitu: {
-            deps: ['jquery', 'crossroads', 'hammer', 'move'],
+            deps: ['jquery', 'hammer', 'move'],
         },
         move: {
             exports: window['move']
@@ -24,8 +24,8 @@ requirejs.config({
     }
 });
 
-requirejs(['application', 'chitu', 'jquery'], function(move, app: chitu.Application) {
+requirejs(['application'], (move, app: chitu.Application) => {
     if (!location.hash) {
-        location.hash = 'home_index';
+        location.hash = '#home/index?text=欢迎使用 ChiTu';
     }
 });

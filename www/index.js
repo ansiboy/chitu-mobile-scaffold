@@ -3,7 +3,7 @@
 requirejs.config({
     shim: {
         chitu: {
-            deps: ['jquery', 'crossroads', 'hammer', 'move'],
+            deps: ['jquery', 'hammer', 'move'],
         },
         move: {
             exports: window['move']
@@ -17,12 +17,13 @@ requirejs.config({
         iscroll: 'js/iscroll-probe',
         jquery: 'js/jquery-2.1.0',
         knockout: 'js/knockout-3.2.0.debug',
+        'knockout.validation': 'js/knockout.validation',
         move: 'js/move',
         text: 'js/text'
     }
 });
-requirejs(['application', 'chitu', 'jquery'], function (move, app) {
+requirejs(['application'], function (move, app) {
     if (!location.hash) {
-        location.hash = 'home_index';
+        location.hash = '#home/index?text=欢迎使用 ChiTu';
     }
 });
