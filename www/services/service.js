@@ -1,4 +1,5 @@
 define(["require", "exports", 'jquery'], function (require, exports, $) {
+    "use strict";
     var Service = (function () {
         function Service() {
             this.error = $.Callbacks();
@@ -33,6 +34,7 @@ define(["require", "exports", 'jquery'], function (require, exports, $) {
             return result;
         };
         return Service;
-    })();
+    }());
     return Service;
 });
+//# sourceMappingURL=service.js.map

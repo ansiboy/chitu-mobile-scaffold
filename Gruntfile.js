@@ -10,7 +10,7 @@ var ts_options = {
 };
 module.exports = function(grunt) {
     grunt.initConfig({
-        typescript: {
+        ts: {
             app: {
                 src: [src_root + '/**/*.ts'],
                 dest: dest_root,
@@ -23,7 +23,7 @@ module.exports = function(grunt) {
                     { expand: true, cwd: src_root, src: ['**/*.html'], dest: dest_root },
                     { expand: true, cwd: src_root, src: ['js/**/*.js'], dest: dest_root },
                     { expand: true, cwd: src_root, src: ['css/**/*.css'], dest: dest_root },
-                    { expand: true, cwd: src_root, src: ['font/**/*.*'], dest: dest_root },
+                    { expand: true, cwd: src_root, src: ['font/**/*.*'], dest: dest_root }
                 ]
             }
         },
@@ -49,14 +49,10 @@ module.exports = function(grunt) {
                     dest: dest_root + '/css/chitu.css'
                 }]
             }
-        },
-        clean: {
-            css: [src_root + '/css/**/*.css'] // 清除编辑器自动生成的 CSS 文件
         }
     });
-    grunt.loadNpmTasks('grunt-typescript');
+    grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.registerTask('default', ['typescript', 'copy', 'less', 'clean']);
+    grunt.registerTask('default', ['ts', 'copy', 'less']);
 }

@@ -1,5 +1,3 @@
-/// <reference path='js/typings/require.d.ts'/>
-/// <reference path='js/typings/chitu.d.ts' />
 requirejs.config({
     shim: {
         chitu: {
@@ -27,3 +25,4 @@ requirejs(['application'], function (move, app) {
         location.hash = '#home/index?text=欢迎使用 ChiTu';
     }
 });
+//# sourceMappingURL=index.js.map
