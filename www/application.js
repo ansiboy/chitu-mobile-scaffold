@@ -4,4 +4,3 @@ define(["require", "exports", 'chitu'], function (require, exports, chitu) {
     app.run();
     return app;
 });
-//# sourceMappingURL=application.js.map

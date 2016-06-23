@@ -25,4 +25,3 @@ requirejs(['application'], function (move, app) {
         location.hash = '#home/index?text=欢迎使用 ChiTu';
     }
 });
-//# sourceMappingURL=index.js.map

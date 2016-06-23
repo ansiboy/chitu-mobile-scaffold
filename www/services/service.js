@@ -37,4 +37,3 @@ define(["require", "exports", 'jquery'], function (require, exports, $) {
     }());
     return Service;
 });
-//# sourceMappingURL=service.js.map

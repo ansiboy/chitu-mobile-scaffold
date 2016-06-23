@@ -6,7 +6,8 @@ var ts_options = {
     removeComments: true,
     references: [
         src_root + "/js/typings/*.d.ts"
-    ]
+    ],
+    sourceMap: false,
 };
 module.exports = function(grunt) {
     grunt.initConfig({
