@@ -6,22 +6,6 @@ declare namespace chitu {
         pageName: string;
         resource?: string[];
     }
-    class UrlParser {
-        private path_string;
-        private path_spliter_char;
-        private param_spliter;
-        private name_spliter_char;
-        private _actionPath;
-        private _viewPath;
-        private _cssPath;
-        private _parameters;
-        private _pageName;
-        private pathBase;
-        private HASH_MINI_LENGTH;
-        constructor(pathBase?: string);
-        pareeUrl(url: string): RouteData;
-        private pareeUrlQuery(query);
-    }
     interface ApplicationConfig {
         container?: (routeData: RouteData, prevous: PageContainer) => PageContainer;
         openSwipe?: (routeData: RouteData) => SwipeDirection;
@@ -29,7 +13,6 @@ declare namespace chitu {
         pathBase?: string;
     }
     class Application {
-        pageCreating: Callback<Application, any>;
         pageCreated: Callback<Application, Page>;
         private _config;
         private _runned;
@@ -40,7 +23,6 @@ declare namespace chitu {
         private container_stack;
         parseUrl: (url: string) => RouteData;
         constructor(config?: ApplicationConfig);
-        private on_pageCreating();
         private on_pageCreated(page);
         config: chitu.ApplicationConfig;
         currentPage(): chitu.Page;
@@ -59,7 +41,6 @@ declare namespace chitu {
     class ControlFactory {
         static createControls(element: HTMLElement, page: Page): Array<Control>;
         static createControl(element: HTMLElement, page: Page): Control;
-        private static transformElement(element);
     }
     class ControlCollection {
         private parent;
@@ -101,7 +82,6 @@ declare namespace chitu {
         clientHeight?: number;
     }
     class ScrollView extends Control {
-        private _bottomLoading;
         scroll: Callback<ScrollView, ScrollArguments>;
         scrollEnd: Callback<ScrollView, ScrollArguments>;
         constructor(element: HTMLElement, page: Page);
@@ -109,7 +89,6 @@ declare namespace chitu {
         protected on_scrollEnd(args: ScrollArguments): JQueryPromise<any>;
         protected on_scroll(args: ScrollArguments): JQueryPromise<any>;
         static createInstance(element: HTMLElement, page: Page): ScrollView;
-        bottomLoading: ScrollViewStatusBar;
         disabled: boolean;
     }
     class ScrollViewStatusBar extends Control {
@@ -122,15 +101,6 @@ declare namespace chitu {
         private init(element);
         refresh(): void;
         disabled: boolean;
-    }
-    class FormLoading extends Control {
-        private loading_element;
-        private _loaded_count;
-        private static _on_load;
-        constructor(element: HTMLElement, page: Page);
-        private defaultHtml();
-        private loaded_count;
-        protected createChild(element: HTMLElement, page: Page): Control;
     }
 }
 declare namespace chitu {
@@ -231,11 +201,11 @@ declare namespace chitu {
         preLoad: Callback<Page, any>;
         load: Callback<Page, any>;
         closing: Callback<Page, any>;
-        closed: Callback<{}, {}>;
-        showing: Callback<{}, {}>;
-        shown: Callback<{}, {}>;
-        hiding: Callback<{}, {}>;
-        hidden: Callback<{}, {}>;
+        closed: Callback<Page, any>;
+        showing: Callback<Page, any>;
+        shown: Callback<Page, any>;
+        hiding: Callback<Page, any>;
+        hidden: Callback<Page, any>;
         constructor(args: PageArguemnts);
         private initialize(container, pageInfo);
         private createControls(element);
@@ -279,7 +249,7 @@ declare namespace chitu {
         show(swipe: SwipeDirection): JQueryPromise<any>;
         hide(swipe: SwipeDirection): JQueryPromise<any>;
         private is_closing;
-        close(swipe: SwipeDirection): void;
+        close(swipe?: SwipeDirection): void;
         private showLoading();
         private hideLoading();
         visible: boolean;
@@ -299,12 +269,12 @@ declare namespace chitu {
     }
     class Pan {
         cancel: boolean;
-        start: (e: any) => void;
-        left: (e: any) => void;
-        right: (e: any) => void;
-        up: (e: any) => void;
-        down: (e: any) => void;
-        end: (e: any) => void;
+        start: (e: Hammer.PanEvent) => void;
+        left: (e: Hammer.PanEvent) => void;
+        right: (e: Hammer.PanEvent) => void;
+        up: (e: Hammer.PanEvent) => void;
+        down: (e: Hammer.PanEvent) => void;
+        end: (e: Hammer.PanEvent) => void;
         constructor(gesture: Gesture);
     }
     class Gesture {
