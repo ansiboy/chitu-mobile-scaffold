@@ -10,6 +10,9 @@ define(["require", "exports"], function (require, exports) {
         function IndexPage(args) {
             _super.call(this, args);
             this.load.add(this.page_load);
+            this.load.add(function (sender, args) {
+                args.name1;
+            });
         }
         IndexPage.prototype.page_load = function (sender, args) {
             $(this.element).find('[name="text"]').text(args.text);

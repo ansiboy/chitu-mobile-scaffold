@@ -1,3 +1,4 @@
+/// <reference path="hammer.d.ts" />
 declare namespace chitu {
     interface RouteData {
         actionPath: string;
